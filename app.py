@@ -9,7 +9,10 @@ import os
 app = Flask(__name__)
 
 # Configuration for Railway
-app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'your-secret-key-change-in-production')
+jwt_secret = os.environ.get('JWT_SECRET_KEY')
+if not jwt_secret:
+    raise RuntimeError("JWT_SECRET_KEY environment variable is required")
+app.config['JWT_SECRET_KEY'] = jwt_secret
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=7)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///moodmind.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
