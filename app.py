@@ -9,10 +9,10 @@ import os
 
 app = Flask(__name__)
 
-# Configuration
-app.config['JWT_SECRET_KEY'] = 'your-secret-key-change-in-production'  # Change this in production!
+# Configuration for Railway
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'your-secret-key-change-in-production')
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=7)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///moodmind.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///moodmind.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize extensions
@@ -76,6 +76,28 @@ def increment_daily_usage(user_id):
     db.session.commit()
 
 # Routes
+@app.route('/', methods=['GET'])
+def home():
+    """Home endpoint - ВИПРАВЛЕННЯ 404 ПОМИЛКИ"""
+    return jsonify({
+        'message': 'MoodMind AI Backend API',
+        'version': '1.0.0',
+        'status': 'running',
+        'description': 'AI-powered mental health and mood journal backend',
+        'endpoints': {
+            'health': '/health',
+            'register': '/register',
+            'login': '/login',
+            'journal': '/journal',
+            'journal_history': '/journal/history',
+            'analyze': '/analyze',
+            'mood_stats': '/mood/stats',
+            'subscription_check': '/subscription/check',
+            'user_profile': '/user/profile'
+        },
+        'documentation': 'https://github.com/alinkastt/moodmind-backend'
+    })
+
 @app.route('/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
@@ -416,4 +438,7 @@ def get_user_profile():
         return jsonify({'error': 'Failed to get user profile', 'message': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    # RAILWAY PRODUCTION
+    port = int(os.environ.get('PORT', 5000))
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+    app.run(debug=debug_mode, host='0.0.0.0', port=port)
