@@ -1,4 +1,3 @@
-
 from flask import Flask, request, jsonify
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_cors import CORS
@@ -95,7 +94,7 @@ def home():
             'subscription_check': '/subscription/check',
             'user_profile': '/user/profile'
         },
-        'documentation': 'https://github.com/alinkastt/moodmind-backend'
+        'documentation': 'https://github.com/alinkast-hub/moodmind-backend'
     })
 
 @app.route('/health', methods=['GET'])
