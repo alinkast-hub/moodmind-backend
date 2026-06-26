@@ -137,8 +137,8 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        # Create access token
-        access_token = create_access_token(identity=user.id)
+        # Create access token (identity must be a string for flask-jwt-extended 4.x)
+        access_token = create_access_token(identity=str(user.id))
 
         return jsonify({
             'message': 'User registered successfully',
@@ -165,8 +165,8 @@ def login():
         if not user or not user.check_password(data['password']):
             return jsonify({'error': 'Invalid credentials'}), 401
 
-        # Create access token
-        access_token = create_access_token(identity=user.id)
+        # Create access token (identity must be a string for flask-jwt-extended 4.x)
+        access_token = create_access_token(identity=str(user.id))
 
         return jsonify({
             'message': 'Login successful',
@@ -182,7 +182,7 @@ def login():
 def create_journal_entry():
     """Create a new journal entry"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         data = request.get_json()
 
         if not data or not all(k in data for k in ('text', 'mood_score')):
@@ -241,7 +241,7 @@ def create_journal_entry():
 def get_journal_history():
     """Get user's journal entry history"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
 
         # Get query parameters
         page = request.args.get('page', 1, type=int)
@@ -297,7 +297,7 @@ def analyze_text():
 def get_mood_stats():
     """Get mood statistics and trends"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
 
         # Get date range (default to last 30 days)
         days = request.args.get('days', 30, type=int)
@@ -397,7 +397,7 @@ def get_mood_stats():
 def check_subscription():
     """Check user's subscription status and usage"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         user = User.query.get(user_id)
 
         if not user:
@@ -432,7 +432,7 @@ def check_subscription():
 def get_user_profile():
     """Get user profile information"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         user = User.query.get(user_id)
 
         if not user:
