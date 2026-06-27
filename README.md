@@ -39,14 +39,22 @@ A comprehensive Flask REST API backend for the MoodMind AI mental health and moo
    pip install -r requirements.txt
    ```
 
-2. **Run the Application**
+2. **Configure Environment Variables**
+   ```bash
+   cp .env.example .env
+   # edit .env and set a real JWT_SECRET_KEY
+   ```
+
+   `JWT_SECRET_KEY` is required — the app will refuse to start without it.
+
+3. **Run the Application**
    ```bash
    python app.py
    ```
 
    The API will be available at `http://localhost:5000`
 
-3. **Test the API**
+4. **Test the API**
    ```bash
    python test_api.py
    ```
@@ -120,15 +128,18 @@ Automatically detects potential burnout when:
 
 ## Configuration
 
-### Environment Variables (Production)
+### Environment Variables
+Copy `.env.example` to `.env` and adjust as needed. `python-dotenv` loads it automatically on startup.
+
 ```bash
-JWT_SECRET_KEY=your-super-secret-key-here
-SQLALCHEMY_DATABASE_URI=your-database-url
-FLASK_ENV=production
+JWT_SECRET_KEY=your-super-secret-key-here   # required, app will not start without it
+DATABASE_URL=sqlite:///moodmind.db          # use a PostgreSQL URL in production
+FLASK_DEBUG=False
+PORT=5000
 ```
 
 ### Development Configuration
-The application uses SQLite by default for development. For production, configure a proper database like PostgreSQL.
+The application uses SQLite by default for development. For production, configure a proper database like PostgreSQL via `DATABASE_URL`.
 
 ## API Usage Examples
 
@@ -181,14 +192,16 @@ Tests include:
 ## File Structure
 
 ```
-moodmind-api/
+moodmind-backend/
 ├── app.py              # Main Flask application
 ├── models.py           # Database models
 ├── ai_service.py       # AI sentiment analysis service
 ├── test_api.py         # Comprehensive API tests
 ├── requirements.txt    # Python dependencies
-├── README.md          # This documentation
-└── moodmind.db        # SQLite database (created automatically)
+├── Procfile            # Process definition for Railway/Heroku-style deploys
+├── .env.example        # Template for required environment variables
+├── README.md           # This documentation
+└── moodmind.db         # SQLite database (created automatically, gitignored)
 ```
 
 ## Production Deployment
@@ -203,10 +216,10 @@ moodmind-api/
 - [ ] Use environment variables for sensitive configuration
 
 ### Recommended Deployment Platforms
-- **Heroku**: Easy deployment with PostgreSQL addon
-- **AWS**: EC2 + RDS for scalable deployment
-- **DigitalOcean**: App Platform for simple deployment
-- **Google Cloud**: Cloud Run for serverless deployment
+This project ships with a `Procfile` (`gunicorn app:app`) targeting **Railway**, which provisions `DATABASE_URL` and runs the `Procfile` automatically. It also works on any platform that supports `Procfile`-based deploys:
+- **Railway**: Push the repo, set `JWT_SECRET_KEY`, attach a PostgreSQL plugin for `DATABASE_URL`
+- **Heroku**: Same `Procfile` works, add a PostgreSQL addon
+- **AWS / DigitalOcean / Google Cloud**: Run `gunicorn app:app` behind your platform's process manager
 
 ## Contributing
 

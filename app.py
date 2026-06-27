@@ -2,9 +2,12 @@ from flask import Flask, request, jsonify
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_cors import CORS
 from datetime import datetime, timedelta, date
+from dotenv import load_dotenv
 from models import db, User, JournalEntry, DailyUsage
 from ai_service import AIService
 import os
+
+load_dotenv()
 
 app = Flask(__name__)
 
